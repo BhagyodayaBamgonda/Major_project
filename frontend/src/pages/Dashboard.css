@@ -1,144 +1,324 @@
+/* Dashboard.css */
+
+/* Main Wrapper */
+.dashboard-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
+  color: #f1f5f9;
+  padding: 20px;
+  animation: fadeIn 1.5s ease-in-out;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.8);
+  padding: 15px 25px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.6);
+}
+
+.dashboard-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  background: linear-gradient(to right, #38bdf8, #a855f7, #f43f5e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 8px #3b82f6;
+}
+
+/* Dashboard Actions */
+.dashboard-actions {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.upload-data-btn,
+.download-dashboard-btn,
+.clear-dashboard-btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.3s;
+}
+
+.upload-data-btn {
+  background: linear-gradient(to right, #8b5cf6, #7c3aed);
+  color: white;
+}
+.upload-data-btn:hover {
+  background: linear-gradient(to right, #7c3aed, #6d28d9);
+  transform: scale(1.05);
+}
+
+.download-dashboard-btn {
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  color: white;
+}
+.download-dashboard-btn:hover {
+  background: linear-gradient(to right, #06b6d4, #f43f5e);
+  transform: scale(1.05);
+  box-shadow: 0px 0px 15px rgba(59, 130, 246, 0.8);
+}
+
+.clear-dashboard-btn {
+  background: #64748b;
+  color: white;
+}
+.clear-dashboard-btn:hover {
+  background: #475569;
+  transform: scale(1.05);
+}
+
+/* Containers */
 .dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.dashboard-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-  color: #2d3748;
-  border-bottom: 2px solid #3182ce;
-  padding-bottom: 0.5rem;
-}
-
-.no-data-message {
-  text-align: center;
-  padding: 2rem;
-  color: #718096;
-  font-style: italic;
+  background: rgba(15, 23, 42, 0.95);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
 }
 
 /* KPI Grid */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
 }
 
 .kpi-card {
-  padding: 1.5rem;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(30, 41, 59, 0.9);
+  padding: 18px;
+  border-radius: 12px;
   text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .kpi-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0px 6px 18px rgba(0,0,0,0.6);
 }
 
 .kpi-title {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: #4a5568;
-  font-size: 0.9rem;
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 6px;
 }
-
 .kpi-value {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #3182ce;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fbbf24;
 }
 
 /* Charts Grid */
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 20px;
 }
 
 .chart-card {
-  padding: 1.5rem;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(30, 41, 59, 0.85);
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease;
+}
+.chart-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0px 6px 18px rgba(0,0,0,0.7);
 }
 
 .chart-title {
-  margin-bottom: 1rem;
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #38bdf8;
   font-weight: 600;
-  color: #2d3748;
-  font-size: 1.1rem;
+  text-align: center;
 }
 
-/* Download Section */
-.download-section {
+.chart-container {
+  width: 100%;
+  height: 400px;
+}
+
+/* Chart loading/error */
+.chart-loading, .chart-error {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right:0;
+  bottom:0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: rgba(30,41,59,0.95);
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  text-align: center;
+}
+
+.modal-content h3 {
+  color: #38bdf8;
+  margin-bottom: 15px;
+}
+
+.modal-content p {
+  color: #cbd5e1;
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-btn {
+  background: #64748b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.file-upload-container {
+  margin: 20px 0;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-upload-label {
+  display: inline-block;
+  padding: 12px 24px;
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.file-upload-label:hover {
+  background: linear-gradient(to right, #2563eb, #7c3aed);
+  transform: translateY(-2px);
+}
+
+.file-types-info {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-top: 8px;
+}
+
+/* Loading Animation */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+  gap: 20px;
+}
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #38bdf8;
+  animation: spin 1s ease-in-out infinite;
+}
+.loading-text {
+  font-size: 18px;
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-container {
+  text-align: center;
+  padding: 40px;
+  background: rgba(239,68,68,0.1);
+  border-radius: 12px;
+  margin: 20px;
+}
+.error-message {
+  color: #f87171;
+  margin-bottom: 20px;
+}
+.error-actions {
+  display: flex;
+  gap: 15px;
   justify-content: center;
 }
 
-.download-button {
-  padding: 0.75rem 1.5rem;
-  background-color: #3182ce;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: bold;
-  transition: background-color 0.2s;
-}
-
-.download-button:hover {
-  background-color: #2c5282;
-}
-.loading-message {
+/* Welcome Message */
+.welcome-message {
   text-align: center;
-  padding: 2rem;
-  color: #3182ce;
-  font-size: 1.1rem;
+  padding: 40px;
+  background: rgba(51,65,85,0.5);
+  border-radius: 12px;
+  margin: 20px auto;
+  max-width: 600px;
 }
 
-.debug-info {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 4px;
-  border-left: 4px solid #dc3545;
-  font-family: monospace;
-  font-size: 0.9rem;
+.supported-formats {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.supported-formats li {
+  font-size: 16px;
+  margin-bottom: 10px;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .kpi-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .charts-grid {
-    grid-template-columns: 1fr;
-  }
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 640px) {
-  .dashboard-container {
-    padding: 1rem;
-  }
-  
-  .kpi-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .kpi-card {
-    padding: 1rem;
-  }
-  
-  .chart-card {
-    padding: 1rem;
-  }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ensure charts render correctly for PDF export */
+.dashboard-container,
+.chart-card,
+.chart-container {
+  background-color: rgba(30,41,59,0.95);
 }
