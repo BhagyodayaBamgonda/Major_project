@@ -1,0 +1,104 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+/* Center layout */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card */
+.auth-card {
+  width: 380px;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Title */
+.auth-card h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Input group */
+.form-group {
+  margin-bottom: 16px;
+}
+
+/* Inputs */
+.auth-card input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border 0.2s ease;
+}
+
+/* Focus */
+.auth-card input:focus {
+  border-color: #2563eb;
+  outline: none;
+}
+
+/* Button */
+.auth-card button {
+  width: 100%;
+  padding: 12px;
+  background-color: #2563eb;
+  border: none;
+  color: white;
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* Hover */
+.auth-card button:hover {
+  background-color: #1e40af;
+}
+
+/* Footer text */
+.auth-footer {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Links */
+.auth-footer a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Error / message */
+.auth-message {
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: red;
+  text-align: center;
+}

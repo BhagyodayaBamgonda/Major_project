@@ -11,6 +11,7 @@ from plotly.utils import PlotlyJSONEncoder
 import traceback
 import logging
 from datetime import datetime
+import bcrypt
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -19,6 +20,15 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)
 
+from flask_mysqldb import MySQL
+
+# MySQL config
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = '11122003'
+app.config['MYSQL_DB'] = 'AutoBI_Users'
+
+mysql = MySQL(app)
 EXPORT_DIR = os.path.join(os.path.dirname(__file__), "exports")
 os.makedirs(EXPORT_DIR, exist_ok=True)
 
@@ -103,6 +113,75 @@ def make_correlation_heatmap(df, numeric_cols):
         charts.append(("heatmap", "correlation", fig))
     return charts
 
+
+@app.route("/register", methods=["POST"])
+def register():
+    try:
+        data = request.json
+        name = data.get("name")
+        email = data.get("email")
+        password = data.get("password")
+
+# 🔐 Hash password here
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        if not name or not email or not password:
+            return jsonify({"error": "All fields required"}), 400
+
+        cur = mysql.connection.cursor()
+
+        # Check if user exists
+        cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+        user = cur.fetchone()
+
+        if user:
+            return jsonify({"message": "User already exists"}), 400
+
+        # Insert user
+        cur.execute(
+        "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
+        (name, email, hashed_password)
+)
+        mysql.connection.commit()
+        cur.close()
+
+        return jsonify({"message": "Registered successfully"}), 201
+
+    except Exception as e:
+        logger.error(str(e))
+        return jsonify({"error": "Registration failed"}), 500
+    
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    try:
+        data = request.json
+        email = data.get("email")
+        password = data.get("password")
+
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+        user = cur.fetchone()
+
+        cur.close()
+
+        if user and bcrypt.checkpw(password.encode('utf-8'), user[3].encode('utf-8')):
+            return jsonify({
+                "message": "Login successful",
+                "user": {
+                    "id": user[0],
+                    "name": user[1],
+                    "email": user[2]
+                }
+            }), 200
+        else:
+            return jsonify({"error": "Invalid credentials"}), 401
+
+    except Exception as e:
+        logger.error(str(e))
+        return jsonify({"error": "Login failed"}), 500
+    
 @app.route("/upload", methods=["POST"])
 def upload():
     try:
@@ -213,23 +292,24 @@ def upload():
 
         # Prepare dashboard data
         dashboard_data = {
-            "kpis": kpis,
-            "columns": cols_meta,
-            "preview": {
-                "columns": [str(c) for c in df.columns],
-                "rows": df.head(10).to_dict(orient="records")
-            },
-            "download_url": f"/download/{cleaned_name}",
-            "charts": chart_specs,
-            "timestamp": datetime.now().isoformat()
-        }
+                "kpis": kpis,
 
-        # Store in history
-        analysis_history.append({
-            "timestamp": datetime.now().isoformat(),
-            "filename": file.filename,
-            "kpis": kpis
-        })
+                # ✅ SIMPLE COLUMN NAMES (for dropdown)
+                "columns": [str(c) for c in df.columns],
+
+                # ✅ FULL DATA (for custom charts)
+                "data": df.to_dict(orient="records"),
+
+                # (optional) keep preview for UI
+                "preview": {
+                    "columns": [str(c) for c in df.columns],
+                    "rows": df.head(10).to_dict(orient="records")
+                },
+
+                "download_url": f"/download/{cleaned_name}",
+                "charts": chart_specs,
+                "timestamp": datetime.now().isoformat()
+            }
 
         return jsonify(dashboard_data)
 

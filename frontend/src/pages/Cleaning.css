@@ -1,74 +1,168 @@
+/* Main Container */
 .cleaning-main-container {
-  display: flex;
-  min-height: 100vh;
-  width: 100vw;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(270deg, #ff6ec4, #7873f5, #4facfe);
-  background-size: 600% 600%;
-  animation: gradientBG 10s ease infinite;
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+background: #0f172a;
+padding: 20px;
+font-family: 'Poppins', sans-serif;
 }
 
+/* Card */
 .cleaning-container {
-  background: rgba(0,0,0,0.25);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-  padding: 48px 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 98vw;
-  max-width: 540px;
+background: #1e293b;
+border-radius: 12px;
+padding: 32px;
+width: 100%;
+max-width: 480px;
+border: 1px solid #334155;
+box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
-.cleaning-title, .cleaning-container label, .cleaning-container input, .cleaning-container select, .cleaning-upload-btn, .cleaning-download-btn {
-  font-weight: bold;
-  font-size: 2rem;
+/* Title */
+.cleaning-title {
+font-size: 22px;
+font-weight: 600;
+color: #f8fafc;
+margin-bottom: 24px;
+text-align: center;
 }
 
+/* Options */
 .cleaning-options {
-  display: flex;
-  flex-direction: column;
-  margin: 20px 0;
-  gap: 20px;
-  width: 100%;
+display: flex;
+flex-direction: column;
+gap: 18px;
 }
 
+/* Labels */
+.cleaning-container label {
+font-size: 13px;
+color: #94a3b8;
+}
+
+/* Inputs */
 .cleaning-file-input,
 .cleaning-select,
 .cleaning-constant-input {
-  margin: 12px 0;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  outline: none;
-  font-size: 1.2rem;
+padding: 10px;
+border-radius: 6px;
+border: 1px solid #334155;
+background: #0f172a;
+color: #e2e8f0;
+font-size: 14px;
+transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Input Focus */
+.cleaning-file-input:focus,
+.cleaning-select:focus,
+.cleaning-constant-input:focus {
+border-color: #2563eb;
+box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+outline: none;
+}
+
+/* Buttons */
 .cleaning-upload-btn,
 .cleaning-download-btn {
-  background: #ff6ec4;
-  padding: 14px 30px;
-  border-radius: 10px;
-  margin: 24px 0 0 0;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.3s;
-  text-decoration: none;
+width: 100%;
+padding: 11px;
+border-radius: 6px;
+font-size: 14px;
+font-weight: 500;
+border: none;
+cursor: pointer;
+margin-top: 12px;
+transition: all 0.2s ease;
 }
 
-.cleaning-upload-btn:hover,
+/* Primary */
+.cleaning-upload-btn {
+background-color: #2563eb;
+color: white;
+}
+
+.cleaning-upload-btn:hover {
+background-color: #1d4ed8;
+transform: translateY(-1px);
+}
+
+/* Secondary */
+.cleaning-download-btn {
+background-color: #475569;
+color: white;
+}
+
 .cleaning-download-btn:hover {
-  background: #4facfe;
-  transform: scale(1.07);
+background-color: #334155;
+transform: translateY(-1px);
 }
 
-/* Existing keyframes remain unchanged */
-@keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* Disabled State */
+.cleaning-upload-btn:disabled,
+.cleaning-download-btn:disabled {
+opacity: 0.6;
+cursor: not-allowed;
 }
+
+/* Responsive */
+@media (max-width: 480px) {
+.cleaning-container {
+padding: 24px;
+}
+}
+
+/* Preview Section */
+.cleaning-preview {
+margin-top: 20px;
+width: 100%;
+overflow-x: auto;
+border: 1px solid #334155;
+border-radius: 8px;
+background: #0f172a;
+padding: 10px;
+}
+
+/* Table */
+.cleaning-preview table {
+width: 100%;
+border-collapse: collapse;
+color: #e2e8f0;
+font-size: 13px;
+}
+
+/* Header */
+.cleaning-preview th {
+background: #020617;
+color: #cbd5e1;
+padding: 10px;
+text-align: left;
+font-weight: 600;
+}
+
+/* Rows */
+.cleaning-preview td {
+padding: 10px;
+border-top: 1px solid #334155;
+}
+
+/* Hover */
+.cleaning-preview tr:hover {
+background: #1e293b;
+}
+
+/* Preview Title */
+.preview-title {
+margin-top: 20px;
+margin-bottom: 10px;
+font-size: 14px;
+color: #94a3b8;
+}
+
+/* Fix Download Button spacing */
+.cleaning-download-btn {
+margin-top: 15px;
+}
+

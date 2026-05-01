@@ -2,29 +2,49 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 40px;
-  background-color: #333;
+  padding: 14px 30px;
+  background-color: #1e293b;
+  border-bottom: 1px solid #334155;
+  position: sticky;
+  top: 0;
+  color: white;
+  z-index: 100;
 }
 
+/* Logo */
 .logo {
-  color: #fff;
-  font-size: 30px;
-  font-weight: bold;
+  color: #f8fafc;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
+/* Links */
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 20px;
+  gap: 18px;
 }
 
+/* Link Style */
 .nav-links li a {
-  color: #fff;
+  color: #cbd5e1;
   text-decoration: none;
-  font-size: 22px;
-  transition: color 0.3s;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
+/* Hover */
 .nav-links li a:hover {
-  color: #ff9800;
+  color: #ffffff;
+  background-color: #334155;
+}
+
+/* Active Link (important for React Router) */
+.nav-links li a.active {
+  color: #ffffff;
+  background-color: #2563eb;
 }

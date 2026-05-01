@@ -1,70 +1,84 @@
-/* src/pages/About.css */
 .about-container {
-  min-height: 100vh;
-  padding: 40px;
-  color: #fff;
-  text-align: center;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(-45deg, #0d0d0d, #1a1a40, #2b5876, #4e4376);
-  background-size: 400% 400%;
-  animation: gradientBG 12s ease infinite;
+min-height: 100vh;
+padding: 40px 20px;
+background: #0f172a;
+color: #e2e8f0;
+font-family: 'Poppins', sans-serif;
+display: flex;
+justify-content: center;
+}
+
+.about-content {
+max-width: 1100px;
+width: 100%;
+}
+
+/* Grid Layout */
+.about-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 40px;
+align-items: start;
+}
+
+/* Left Section */
+.about-left {
+display: flex;
+flex-direction: column;
 }
 
 .about-title {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  color: #00e6e6;
-  text-shadow: 0px 0px 15px rgba(0, 230, 230, 0.7);
+font-size: 30px;
+font-weight: 600;
+color: #f8fafc;
+margin-bottom: 15px;
 }
 
 .about-description {
-  font-size: 1.2rem;
-  max-width: 800px;
-  margin: 0 auto 30px auto;
-  line-height: 1.8;
+font-size: 15px;
+line-height: 1.7;
+color: #cbd5e1;
+}
+
+/* Right Section */
+.about-right {
+display: flex;
+flex-direction: column;
 }
 
 .about-features-title {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-  color: #ffcc70;
-  text-shadow: 0px 0px 10px rgba(255, 204, 112, 0.6);
+font-size: 18px;
+font-weight: 600;
+margin-bottom: 15px;
+color: #38bdf8;
 }
 
+/* Feature Cards */
 .about-features-list {
-  list-style: none;
-  padding: 0;
-  max-width: 700px;
-  margin: 0 auto 30px auto;
-  text-align: left;
+list-style: none;
+padding: 0;
 }
 
 .about-features-list li {
-  font-size: 1.1rem;
-  margin: 10px 0;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  transition: transform 0.3s ease, background 0.3s ease;
+padding: 12px 14px;
+margin-bottom: 10px;
+background: #1e293b;
+border-radius: 8px;
+border: 1px solid #334155;
+font-size: 14px;
 }
 
-.about-features-list li:hover {
-  transform: translateX(10px);
-  background: rgba(0, 230, 230, 0.2);
-}
-
+/* Closing text below */
 .about-closing {
-  font-size: 1.2rem;
-  margin-top: 30px;
-  color: #d1d1d1;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: 1.8;
+margin-top: 30px;
+font-size: 15px;
+line-height: 1.7;
+color: #94a3b8;
 }
 
-@keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* Responsive */
+@media (max-width: 768px) {
+.about-grid {
+grid-template-columns: 1fr;
+}
 }
