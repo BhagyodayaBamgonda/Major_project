@@ -8,5 +8,5 @@ def extract_schema(df: pd.DataFrame) -> Dict[str, str]:
     schema = {}
     for column, dtype in df.dtypes.items():
         schema[column] = str(dtype)
-    logger.info(f"Extracted schema with {len(schema)} columns")
+    logger.info(f"Extracted schema: {schema}")
     return schema

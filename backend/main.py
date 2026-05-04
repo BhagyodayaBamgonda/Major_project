@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import logging
 
-# Configure logging
+# Configure global logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -12,7 +12,8 @@ logging.basicConfig(
         logging.FileHandler("backend.log")
     ]
 )
-logger = logging.getLogger("main")
+# Explicitly set levels for some noisy loggers
+logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
 
 from routers import upload, chat, schema
 

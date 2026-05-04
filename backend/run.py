@@ -9,7 +9,7 @@ def run_servers():
     Launches both the FastAPI AI Chatbot and the legacy Flask Backend.
     """
     print("="*50)
-    print("🚀 LAUNCHING MULTI-SERVICE BACKEND")
+    print("LAUNCHING MULTI-SERVICE BACKEND")
     print("="*50)
 
     # 1. Start FastAPI on Port 8000
@@ -28,7 +28,7 @@ def run_servers():
     )
 
     print("\n" + "="*50)
-    print("✅ BOTH SERVICES ARE RUNNING")
+    print("SUCCESS: BOTH SERVICES ARE RUNNING")
     print("Press Ctrl+C to stop both servers.")
     print("="*50 + "\n")
 
@@ -38,18 +38,18 @@ def run_servers():
             time.sleep(1)
             # Check if any process has crashed
             if fastapi_proc.poll() is not None:
-                print("❌ FastAPI server stopped unexpectedly.")
+                print("FastAPI server stopped unexpectedly.")
                 break
             if flask_proc.poll() is not None:
-                print("❌ Flask server stopped unexpectedly.")
+                print("Flask server stopped unexpectedly.")
                 break
     except KeyboardInterrupt:
-        print("\n\n🛑 Stopping servers...")
+        print("\n\nStopping servers...")
     finally:
         # Graceful shutdown
         fastapi_proc.terminate()
         flask_proc.terminate()
-        print("👋 Servers stopped. Goodbye!")
+        print("Servers stopped. Goodbye!")
 
 if __name__ == "__main__":
     run_servers()

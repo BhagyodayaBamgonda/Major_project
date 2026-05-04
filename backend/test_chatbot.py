@@ -20,7 +20,7 @@ if response.status_code == 200:
     
     if session_id:
         questions = [
-            "Show the name of channel partner whose city is Gurugram",
+            "Total channel partners whose city is kolkata",
         ]
         
         for q in questions:

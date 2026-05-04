@@ -13,38 +13,65 @@ router = APIRouter()
 
 ALLOWED_EXTENSIONS = {".csv", ".xlsx", ".xls"}
 
+def clean_dataframe(df):
+    # Normalize column names
+    df.columns = (
+        df.columns
+        .str.strip()
+        .str.replace("\u00A0", " ", regex=False)
+    )
+
+    # Normalize string values
+    for col in df.select_dtypes(include="object"):
+        df[col] = (
+            df[col]
+            .astype(str)
+            .str.replace("\u00A0", " ", regex=False)
+            .str.strip()
+        )
+
+    return df
+
 @router.post("/upload", response_model=UploadResponse)
 def upload_file(file: UploadFile = File(...)):
-    # Validate file extension
+
     file_ext = "." + file.filename.split(".")[-1].lower() if "." in file.filename else ""
     if file_ext not in ALLOWED_EXTENSIONS:
-        logger.warning(f"Rejected upload of unsupported file type: {file.filename}")
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail=f"Unsupported file type '{file_ext}'. Supported types are: {', '.join(ALLOWED_EXTENSIONS)}"
         )
-    
+
     logger.info(f"Uploading file: {file.filename}")
-    
-    # Synchronous function runs in a thread pool, preventing event loop blocking
+
     try:
-        # Load the dataframe
+        # 1. Load dataframe
         df = load_file_to_dataframe(file)
-        
-        # Extract schema
+
+        # 🔥 2. CLEAN DATA (THIS FIXES YOUR ENTIRE ISSUE)
+        df = clean_dataframe(df)
+
+        # 3. Extract schema AFTER cleaning
         schema_info = extract_schema(df)
-        
-        # Create session ID
+
+        # 4. Create session
         session_id = str(uuid.uuid4())
-        
-        # Store in memory (LRU Cache handles limits)
+
+        # 5. Store cleaned df
         session_store[session_id] = {
             "df": df,
             "schema": schema_info
         }
-        
-        return UploadResponse(session_id=session_id, schema_info=schema_info)
+
+        return UploadResponse(
+            success=True,
+            session_id=session_id,
+            schema_info=schema_info
+        )
+
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
+        logger.exception("Upload failed")
+        raise HTTPException(status_code=500, detail="Failed to process file")

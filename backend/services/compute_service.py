@@ -30,11 +30,27 @@ def execute_pandas_code(df: pd.DataFrame, code: str) -> Tuple[Any, str]:
         
     # Operate on a copy to prevent corrupting the original df on error
     safe_df = df.copy()
-    local_env = {"df": safe_df}
+    # Inject pd and np directly so generated code can use them freely
+    # (no import statements needed or allowed in generated code)
+    local_env = {"df": safe_df, "pd": pd, "np": np}
     
     try:
-        # Execute the code safely
-        exec(code, {"__builtins__": {}}, local_env)
+        # Execute the code with a safe whitelist of built-ins.
+        # Empty __builtins__ breaks pandas code that uses str/int/float/etc.
+        _safe_builtins = {
+            "str": str, "int": int, "float": float, "bool": bool,
+            "list": list, "dict": dict, "tuple": tuple, "set": set,
+            "len": len, "range": range, "print": print,
+            "isinstance": isinstance, "type": type,
+            "abs": abs, "round": round,
+            "min": min, "max": max, "sum": sum,
+            "enumerate": enumerate, "zip": zip,
+            "map": map, "filter": filter,
+            "sorted": sorted, "reversed": reversed,
+            "any": any, "all": all,
+            "None": None, "True": True, "False": False,
+        }
+        exec(code, {"__builtins__": _safe_builtins}, local_env)
         
         if "result" not in local_env:
             raise ValueError("The generated code did not define a 'result' variable.")
@@ -43,9 +59,11 @@ def execute_pandas_code(df: pd.DataFrame, code: str) -> Tuple[Any, str]:
         
         # Convert pandas/numpy objects for JSON serialization
         # Check Series/DataFrame FIRST because they have an .item() method that crashes on multiple values
-        if isinstance(result, (pd.Series, pd.DataFrame)):
+        if isinstance(result, pd.DataFrame):
             # Replace NaNs with None for JSON compliance
-            result = result.replace({np.nan: None}).to_dict()
+            result = result.replace({np.nan: None}).to_dict(orient="records")
+        elif isinstance(result, pd.Series):
+            result = result.replace({np.nan: None}).tolist()
         elif hasattr(result, "item") and callable(getattr(result, "item")):
             # Check if it's a single element before calling .item()
             if hasattr(result, "size") and result.size > 1:
@@ -78,6 +96,11 @@ def detect_simple_query(df: pd.DataFrame, norm_query: str) -> Tuple[Any, Optiona
     # Special case: "total unique" -> "nunique"
     if "unique" in words:
         op = "nunique"
+
+    # SAFETY: If the query contains filtering keywords, fallback to LLM
+    filter_keywords = {"whose", "where", "is", "equal", "to", "for", "with", "only"}
+    if any(w in filter_keywords for w in words):
+        return None, None
 
     if not op:
         return None, None
@@ -125,8 +148,8 @@ def detect_simple_query(df: pd.DataFrame, norm_query: str) -> Tuple[Any, Optiona
 
 def generate_local_explanation(answer: Any) -> str:
     """Generates a simple, local human-readable response without LLM calls."""
-    if answer is None:
-        return "I could not compute a result for that query."
+    if answer is None or (isinstance(answer, list) and len(answer) == 0):
+        return "No matching records were found for your request."
     if isinstance(answer, (list, dict)):
-        return "Here is the extracted data structure."
-    return f"The calculated result is: {answer}"
+        return "I found the following data: {{result}}"
+    return "The result is: {{result}}"
