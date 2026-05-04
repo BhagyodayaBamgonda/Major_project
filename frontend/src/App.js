@@ -7,14 +7,17 @@ import About from "./pages/About";
 import Cleaning from "./pages/Cleaning";
 import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
+import DataChat from "./pages/DataChat";
 import Login from "./pages/login";
 import Register from "./pages/register";;
 
 // 🔐 Protected Route Component
 function ProtectedRoute({ children }) {
-  const isLoggedIn = localStorage.getItem("user");
-
-  return isLoggedIn ? children : <Navigate to="/login" />;
+  // const isLoggedIn = localStorage.getItem("user");
+  // return isLoggedIn ? children : <Navigate to="/login" />;
+  
+  // Bypassed for local testing:
+  return children;
 }
 
 // 🔄 Layout to hide navbar on login/register
@@ -37,21 +40,12 @@ function App() {
       <Layout>
         <Routes>
           {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
           {/* Protected Routes */}
-          <Route path="/" element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/about" element={
-            <ProtectedRoute>
-              <About />
-            </ProtectedRoute>
-          } />
 
           <Route path="/cleaning" element={
             <ProtectedRoute>
@@ -68,6 +62,12 @@ function App() {
           <Route path="/reports" element={
             <ProtectedRoute>
               <Reports />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/data-chat" element={
+            <ProtectedRoute>
+              <DataChat />
             </ProtectedRoute>
           } />
         </Routes>

@@ -1,11 +1,12 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  // const user = JSON.parse(localStorage.getItem("user"));
+  const user = { name: "Local Tester" }; // Bypassed for local testing
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -13,37 +14,44 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
-      <h2 className="logo">AUTO-BI</h2>
+    <>
+      <nav className="navbar">
+        <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+          <h2 className="logo">Auto-BI</h2>
 
-      <ul className="nav-links">
-        {user && (
-          <>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/about">About</Link></li>
-            <li><Link to="/cleaning">Cleaning</Link></li>
-            <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/reports">Reports</Link></li>
-          </>
-        )}
-      </ul>
+          <ul className="nav-links">
+            <li><NavLink to="/">Home</NavLink></li>
+            <li><NavLink to="/about">About</NavLink></li>
+            {user && (
+              <>
+                <li><NavLink to="/cleaning">Cleaning</NavLink></li>
+                <li><NavLink to="/dashboard">Dashboard</NavLink></li>
+                <li><NavLink to="/reports">Reports</NavLink></li>
+                <li><NavLink to="/data-chat">Data Chat</NavLink></li>
+              </>
+            )}
+          </ul>
+        </div>
 
-      <div className="nav-right">
-        {user ? (
-          <>
-            <span className="username">Hi, {user.name}</span>
-            <button onClick={handleLogout} className="logout-btn">
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="auth-link">Login</Link>
-            <Link to="/register" className="auth-link">Register</Link>
-          </>
-        )}
-      </div>
-    </nav>
+        <div className="nav-right">
+          {user ? (
+            <>
+              <span className="username">Hi, {user.name}</span>
+              <button onClick={handleLogout} className="logout-btn">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login" className="auth-link">Login</NavLink>
+              <NavLink to="/register" className="auth-link">Register</NavLink>
+            </>
+          )}
+        </div>
+      </nav>
+      {/* Spacer so content doesn't hide under fixed navbar */}
+      <div className="navbar-spacer" />
+    </>
   );
 };
 

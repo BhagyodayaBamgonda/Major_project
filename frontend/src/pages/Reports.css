@@ -1,120 +1,183 @@
-/* Container */
-.reports-container {
-padding: 30px;
-min-height: 100vh;
-background: #0f172a;
-color: #e2e8f0;
-font-family: 'Poppins', sans-serif;
+/* ── Reports Page ── */
+.reports-page {
+  min-height: 100vh;
+  background: var(--surface);
+  padding: 36px 32px 48px;
+  font-family: 'Inter', sans-serif;
+  color: var(--on-surface);
 }
 
-/* Title */
-.reports-title {
-font-size: 24px;
-font-weight: 600;
-margin-bottom: 25px;
-color: #f8fafc;
+/* ── Header ── */
+.reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 18px 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid var(--outline-subtle);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
-/* KPI Section */
+.rh-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rh-title .material-symbols-outlined {
+  font-size: 28px;
+  color: var(--primary);
+}
+.rh-title h2 {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--on-surface);
+  letter-spacing: -0.02em;
+}
+
+/* ── Actions ── */
+.reports-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.reports-actions button,
+.reports-empty-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+.reports-actions button .material-symbols-outlined { font-size: 18px; }
+
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: #004c6e; transform: translateY(-1px); }
+
+.btn-outline { background: #fff; color: var(--on-surface); border: 1px solid var(--outline-subtle) !important; }
+.btn-outline:hover { background: var(--surface-low); }
+
+.btn-danger { background: #fff1f2; color: #be123c; border: 1px solid #fda4af !important; }
+.btn-danger:hover { background: #fecdd3; }
+
+/* ── Content Area ── */
+.reports-content {
+  background: #fff;
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid var(--outline-subtle);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+
+/* ── KPIs ── */
 .reports-kpis {
-display: flex;
-flex-wrap: wrap;
-gap: 16px;
-margin-bottom: 25px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
 }
 
-/* KPI Card */
-.report-card {
-background: #1e293b;
-padding: 16px 20px;
-border-radius: 10px;
-border: 1px solid #334155;
-min-width: 160px;
-transition: 0.2s ease;
+.report-kpi-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--outline-subtle);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.report-kpi-card:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+.report-kpi-card h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--on-surface-muted);
+  letter-spacing: 0.05em;
+}
+.report-kpi-card p {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
 }
 
-.report-card:hover {
-border-color: #2563eb;
-transform: translateY(-3px);
+/* ── Tables ── */
+.reports-table-wrap {
+  margin-bottom: 32px;
+}
+.table-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin: 0 0 12px;
 }
 
-/* Table Wrapper */
 .reports-table {
-margin-top: 20px;
-overflow-x: auto;
-border-radius: 10px;
-border: 1px solid #334155;
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--outline-subtle);
+  border-radius: 10px;
+  background: var(--surface);
 }
 
-/* Table */
 .reports-table table {
-width: 100%;
-border-collapse: collapse;
-background: #1e293b;
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--on-surface);
+  font-size: 13px;
 }
 
-/* Table Header */
 .reports-table th {
-padding: 12px;
-text-align: left;
-background: #020617;
-color: #cbd5e1;
-font-size: 13px;
-font-weight: 600;
+  background: var(--surface-low);
+  color: var(--on-surface-muted);
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid var(--outline-subtle);
+  white-space: nowrap;
 }
 
-/* Table Cells */
 .reports-table td {
-padding: 12px;
-font-size: 14px;
-border-top: 1px solid #334155;
+  padding: 12px 16px;
+  border-top: 1px solid #f1f5f9;
+  white-space: nowrap;
 }
 
-/* Row Hover */
-.reports-table tr:hover {
-background: #334155;
+.reports-table tr:hover td {
+  background: #f8fbff;
 }
 
-/* Buttons */
-.download-report-btn,
-.clear-report-data-btn {
-margin-top: 20px;
-margin-right: 10px;
-padding: 10px 18px;
-font-size: 14px;
-border-radius: 6px;
-border: none;
-cursor: pointer;
-transition: 0.2s ease;
+/* ── Empty State ── */
+.reports-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 60vh;
+  text-align: center;
+  background: #fff;
+  border: 1px dashed var(--outline);
+  border-radius: 16px;
+  color: var(--on-surface-muted);
 }
+.reports-empty .empty-icon { font-size: 56px; color: var(--outline-subtle); }
+.reports-empty h2 { margin: 0; font-size: 20px; font-weight: 700; color: var(--on-surface); }
+.reports-empty p { margin: 0 0 16px; font-size: 15px; }
 
-/* Primary */
-.download-report-btn {
-background-color: #2563eb;
-color: white;
-}
-
-.download-report-btn:hover {
-background-color: #1d4ed8;
-}
-
-/* Danger */
-.clear-report-data-btn {
-background-color: #dc2626;
-color: white;
-}
-
-.clear-report-data-btn:hover {
-background-color: #b91c1c;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-.reports-kpis {
-flex-direction: column;
-}
-
-.report-card {
-width: 100%;
-}
+.reports-empty-actions {
+  display: flex;
+  gap: 12px;
 }

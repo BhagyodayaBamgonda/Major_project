@@ -32,6 +32,38 @@ async def chat(request: ChatRequest):
 
     norm_query = normalize_query(request.question)
 
+    # ── Rule-Based Interceptors (Save Quota) ────────────────────────────────
+    clean_q = request.question.strip().lower()
+
+    greetings = ["hi", "hello", "hey", "hii", "hiii", "helloo", "hola", "good morning", "good evening", "good afternoon"]
+    farewells = ["bye", "goodbye", "see ya", "see you", "exit", "quit", "cya", "ok bye", "bye bye"]
+    thanks = ["thanks", "thank you", "thx", "tysm", "thanks a lot", "thankyou"]
+    bot_identity = ["who are you", "what are you", "who are you?", "what are you?", "what is your name", "what is your name?"]
+    
+    if clean_q in greetings:
+        return ChatResponse(
+            success=True, question=request.question, query=None, answer=None,
+            message="Hello! 👋 I am your Auto-BI assistant. Ask me anything about your uploaded data, like 'How many channel partners are in Mumbai?'",
+            error=None
+        )
+    elif clean_q in farewells:
+        return ChatResponse(
+            success=True, question=request.question, query=None, answer=None,
+            message="Goodbye! 👋 Have a great day! Let me know if you need to analyze more data later.",
+            error=None
+        )
+    elif clean_q in thanks:
+        return ChatResponse(
+            success=True, question=request.question, query=None, answer=None,
+            message="You're very welcome! 😊 Let me know if you have any other questions about your data.",
+            error=None
+        )
+    elif clean_q in bot_identity:
+        return ChatResponse(
+            success=True, question=request.question, query=None, answer=None,
+            message="I am Auto-BI's AI Data Analyst. I can convert your plain English questions into pandas code and fetch insights directly from your uploaded data!",
+            error=None
+        )
     # ── Cache check ─────────────────────────────────────────────────────────
     cached_data = query_cache.get(request.session_id, norm_query)
     if cached_data:
@@ -152,13 +184,23 @@ async def chat(request: ChatRequest):
             error=None,
         )
 
-    except Exception:
-        logger.exception("[ERROR] Chat pipeline failure.")
+    except Exception as e:
+        error_msg = str(e)
+        logger.exception(f"[ERROR] Chat pipeline failure: {error_msg}")
+
+        # Rule-based error info handling for Gemini API Rate Limits (429)
+        if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg or "quota" in error_msg.lower():
+            friendly_message = "AI Error: Daily API request limit exceeded. Please wait a moment and try again."
+            error_code = "QUOTA_EXCEEDED"
+        else:
+            friendly_message = "Something went wrong while processing your request."
+            error_code = "INTERNAL_ERROR"
+
         return ChatResponse(
             success=False,
             question=request.question,
             query=None,
             answer=None,
-            message="Something went wrong while processing your request.",
-            error="INTERNAL_ERROR",
+            message=friendly_message,
+            error=error_code,
         )

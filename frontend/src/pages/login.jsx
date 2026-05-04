@@ -33,6 +33,9 @@ function Login() {
 
   return (
     <div className="auth-wrapper">
+      <Link to="/" className="back-link">
+        ← Back to Home
+      </Link>
       <div className="auth-card">
         <h2>Sign In</h2>
 

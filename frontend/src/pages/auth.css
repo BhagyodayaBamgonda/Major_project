@@ -102,3 +102,22 @@ body {
   color: red;
   text-align: center;
 }
+
+/* Back Link */
+.back-link {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: #2563eb;
+}
