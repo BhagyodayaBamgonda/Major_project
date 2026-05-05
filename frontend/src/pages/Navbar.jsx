@@ -5,8 +5,7 @@ import "./Navbar.css";
 const Navbar = () => {
   const navigate = useNavigate();
 
-  // const user = JSON.parse(localStorage.getItem("user"));
-  const user = { name: "Local Tester" }; // Bypassed for local testing
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
     localStorage.removeItem("user");
