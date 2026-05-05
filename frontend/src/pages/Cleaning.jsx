@@ -27,35 +27,27 @@ export default function Cleaning() {
     setLoading(true);
 
     try {
-      const text = await file.text();
-      const lines = text.trim().split("\n");
-      if (lines.length < 2) { alert("Invalid CSV file!"); return; }
-
-      const headers = lines[0].split(",").map(h => h.trim());
-      const data = [];
-
-      for (let i = 1; i < lines.length; i++) {
-        if (lines[i].trim()) {
-          const values = lines[i].split(",").map(v => v.trim());
-          const row = {};
-          headers.forEach((header, index) => { row[header] = values[index] || null; });
-          data.push(row);
-        }
-      }
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("remove_nulls",      String(options.remove_nulls));
+      formData.append("remove_duplicates", String(options.remove_duplicates));
+      formData.append("fill_strategy",     options.fill_strategy);
+      formData.append("fill_constant",     options.fill_constant);
+      formData.append("standardize",       String(options.standardize));
+      formData.append("normalize",         String(options.normalize));
 
       const res = await fetch("http://127.0.0.1:5000/clean", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data, options }),
+        body: formData,
       });
 
       if (!res.ok) throw new Error("Server error");
 
       const result = await res.json();
       setCleanedData(result.cleaned_data);
-      setCleanedHeaders(headers);
+      setCleanedHeaders(result.columns);
 
-      const csvContent = convertToCSV(result.cleaned_data, headers);
+      const csvContent = convertToCSV(result.cleaned_data, result.columns);
       const blob = new Blob([csvContent], { type: "text/csv" });
       const url = window.URL.createObjectURL(blob);
       setCleanedFileUrl(url);

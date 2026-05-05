@@ -425,36 +425,41 @@ def create_dashboard():
 
 @app.route("/clean", methods=["POST"])
 def clean_data():
-    """Endpoint to clean data without uploading a new file"""
+    """Endpoint to clean data. Accepts either multipart/form-data with file, or JSON."""
     try:
         logger.info("Received request to /clean endpoint")
         
-        # Check if request has JSON data
-        if not request.is_json:
-            logger.error("Request is not JSON")
-            return jsonify({"error": "Request must be JSON"}), 400
+        if "file" in request.files:
+            # New, robust path: let pandas parse the CSV
+            file = request.files["file"]
+            df = pd.read_csv(file)
             
-        data = request.get_json()
-        logger.info(f"Request data received")
-        
-        if not data or "data" not in data:
-            logger.error("No data provided in request")
-            return jsonify({"error": "No data provided"}), 400
+            remove_nulls = request.form.get("remove_nulls", "false").lower() == "true"
+            remove_dupes = request.form.get("remove_duplicates", "false").lower() == "true"
+            fill_strategy = request.form.get("fill_strategy", "none").lower()
+            fill_constant = request.form.get("fill_constant", "")
+            standardize = request.form.get("standardize", "false").lower() == "true"
+            normalize = request.form.get("normalize", "false").lower() == "true"
             
-        # Convert to DataFrame
-        df = pd.DataFrame(data["data"])
-        df = infer_and_convert_types(df)
-        logger.info(f"DataFrame created with shape: {df.shape}")
-        
-        # Get cleaning options from request
-        options = data.get("options", {})
-        remove_nulls = options.get("remove_nulls", False)
-        remove_dupes = options.get("remove_duplicates", False)
-        fill_strategy = options.get("fill_strategy", "none").lower()
-        fill_constant = options.get("fill_constant", "")
-        standardize = options.get("standardize", False)
-        normalize = options.get("normalize", False)
-        
+        elif request.is_json:
+            # Old, brittle path (kept for backwards compatibility if needed)
+            data = request.get_json()
+            if not data or "data" not in data:
+                return jsonify({"error": "No data provided"}), 400
+                
+            df = pd.DataFrame(data["data"])
+            df = infer_and_convert_types(df)
+            
+            options = data.get("options", {})
+            remove_nulls = options.get("remove_nulls", False)
+            remove_dupes = options.get("remove_duplicates", False)
+            fill_strategy = options.get("fill_strategy", "none").lower()
+            fill_constant = options.get("fill_constant", "")
+            standardize = options.get("standardize", False)
+            normalize = options.get("normalize", False)
+        else:
+            return jsonify({"error": "Invalid request format"}), 400
+            
         logger.info(f"Cleaning options: remove_nulls={remove_nulls}, remove_dupes={remove_dupes}, fill_strategy={fill_strategy}")
         
         # Apply cleaning operations

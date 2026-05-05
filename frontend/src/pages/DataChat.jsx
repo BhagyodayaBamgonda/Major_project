@@ -54,9 +54,21 @@ export default function DataChat() {
       setShowUpload(false);
       setError(null);
 
+      // schema_info may be a plain dict { col: dtype } OR a list of
+      // { column, dtype, role, non_null_count } objects — handle both
+      const schemaInfo = data.schema_info;
+      let columnNames;
+      if (Array.isArray(schemaInfo)) {
+        columnNames = schemaInfo.map(item => item.column ?? item).join(", ");
+      } else if (schemaInfo && typeof schemaInfo === "object") {
+        columnNames = Object.keys(schemaInfo).join(", ");
+      } else {
+        columnNames = "(unknown)";
+      }
+
       setMessages([{
         role: "bot",
-        text: `✅ File uploaded successfully.\n\nDetected columns: ${Object.keys(data.schema_info).join(", ")}\n\nYou can now ask questions about your data.`,
+        text: `✅ File uploaded successfully.\n\nDetected columns: ${columnNames}\n\nYou can now ask questions about your data.`,
       }]);
 
     } catch (err) {
@@ -98,11 +110,18 @@ export default function DataChat() {
         return;
       }
 
+      // Ensure message is always a plain string so React never tries
+      // to render an object as a child (causes "Objects are not valid" error)
+      const safeMessage =
+        typeof data.message === "string"
+          ? data.message
+          : JSON.stringify(data.message, null, 2);
+
       setMessages((prev) => [
         ...prev,
         {
           role: "bot",
-          text: data.message,
+          text: safeMessage,
           code: data.query || null,
         },
       ]);
@@ -224,7 +243,9 @@ export default function DataChat() {
                   key={i}
                   className={`chat-message ${msg.role}${msg.error ? " error" : ""}`}
                 >
-                  <div className="chat-bubble">{msg.text}</div>
+                  <div className="chat-bubble">
+                    {typeof msg.text === "string" ? msg.text : JSON.stringify(msg.text, null, 2)}
+                  </div>
 
                   {/* Show generated pandas code if present */}
                   {msg.code && (
