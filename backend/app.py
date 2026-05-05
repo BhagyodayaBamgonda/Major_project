@@ -182,6 +182,17 @@ def login():
         email = data.get("email")
         password = data.get("password")
 
+        # Hardcoded admin login
+        if email == "admin@admin.com" and password == "admin":
+            return jsonify({
+                "message": "Login successful",
+                "user": {
+                    "id": 999,
+                    "name": "Admin",
+                    "email": "admin@admin.com"
+                }
+            }), 200
+
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM users WHERE email=%s", (email,))
         user = cur.fetchone()
