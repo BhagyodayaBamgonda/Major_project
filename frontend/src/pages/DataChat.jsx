@@ -26,6 +26,35 @@ export default function DataChat() {
     if (!loading) inputRef.current?.focus();
   }, [loading]);
 
+  // ── Auto-load session from Cleaning page if available ────────────────────
+  useEffect(() => {
+    const savedData = localStorage.getItem("chatSessionData");
+    if (savedData) {
+      try {
+        const { sessionId: savedSessionId, schemaInfo } = JSON.parse(savedData);
+        setSessionId(savedSessionId);
+        
+        let columnNames;
+        if (Array.isArray(schemaInfo)) {
+          columnNames = schemaInfo.map(item => item.column ?? item).join(", ");
+        } else if (schemaInfo && typeof schemaInfo === "object") {
+          columnNames = Object.keys(schemaInfo).join(", ");
+        } else {
+          columnNames = "(unknown)";
+        }
+
+        setMessages([{
+          role: "bot",
+          text: `✅ Cleaned data received automatically.\n\nDetected columns: ${columnNames}\n\nYou can now ask questions about your data.`,
+        }]);
+
+        localStorage.removeItem("chatSessionData");
+      } catch (err) {
+        console.error("Error reading chat session data", err);
+      }
+    }
+  }, []);
+
   // ── File Upload → get session_id ─────────────────────────────────────────
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -73,6 +102,61 @@ export default function DataChat() {
 
     } catch (err) {
       setError("Upload failed: " + err.message);
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  // ── Initialize Chat with Recent Cleaned Data (from localStorage) ─────────
+  const handleChatWithRecentData = async (parsed) => {
+    setUploadLoading(true);
+    setError(null);
+    try {
+      // Reconstruct CSV content from parsed data
+      const csvRows = [parsed.cleanedHeaders.join(",")];
+      for (const row of parsed.cleanedData) {
+        const values = parsed.cleanedHeaders.map(header => {
+          const value = row[header];
+          return value !== null && value !== undefined ? `"${value}"` : "";
+        });
+        csvRows.push(values.join(","));
+      }
+      const csvContent = csvRows.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const csvFile = new File([blob], "cleaned_data.csv", { type: "text/csv" });
+
+      const formData = new FormData();
+      formData.append("file", csvFile);
+
+      const res = await fetch(`${API_BASE}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Upload failed");
+
+      setSessionId(data.session_id);
+      setMessages([]);
+      setShowUpload(false);
+      
+      const schemaInfo = data.schema_info;
+      let columnNames;
+      if (Array.isArray(schemaInfo)) {
+        columnNames = schemaInfo.map(item => item.column ?? item).join(", ");
+      } else if (schemaInfo && typeof schemaInfo === "object") {
+        columnNames = Object.keys(schemaInfo).join(", ");
+      } else {
+        columnNames = "(unknown)";
+      }
+
+      setMessages([{
+        role: "bot",
+        text: `✅ Recent cleaned data loaded successfully.\n\nDetected columns: ${columnNames}\n\nYou can now ask questions about your data.`,
+      }]);
+
+    } catch (err) {
+      setError("Failed to initialize chat with recent data: " + err.message);
     } finally {
       setUploadLoading(false);
     }
@@ -222,6 +306,31 @@ export default function DataChat() {
             >
               Upload File
             </button>
+            
+            {/* ── NEW: Talk to recent cleaned dataset ── */}
+            {(() => {
+              const saved = localStorage.getItem("cleaningSessionData");
+              if (saved) {
+                try {
+                  const parsed = JSON.parse(saved);
+                  if (Date.now() - parsed.timestamp < 10 * 60 * 1000) {
+                    return (
+                      <div style={{ marginTop: "30px", borderTop: "1px solid #eee", paddingTop: "20px" }}>
+                        <p style={{ color: "#666", marginBottom: "15px" }}>Or talk to your recently cleaned dataset:</p>
+                        <button
+                          className="chat-btn chat-btn-secondary"
+                          onClick={() => handleChatWithRecentData(parsed)}
+                          disabled={uploadLoading}
+                        >
+                          {uploadLoading ? "Starting Chat…" : "Talk to recent cleaned dataset"}
+                        </button>
+                      </div>
+                    );
+                  }
+                } catch (e) {}
+              }
+              return null;
+            })()}
           </div>
         ) : (
           <>

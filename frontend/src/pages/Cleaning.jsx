@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Cleaning.css";
 
@@ -8,6 +8,7 @@ export default function Cleaning() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
 
   const [options, setOptions] = useState({
     remove_nulls: false,
@@ -21,6 +22,28 @@ export default function Cleaning() {
   const [cleanedFileUrl, setCleanedFileUrl] = useState(null);
   const [cleanedData, setCleanedData] = useState([]);
   const [cleanedHeaders, setCleanedHeaders] = useState([]);
+
+  // ── Restore State on Mount (10 min retention) ───────────────────────────
+  useEffect(() => {
+    const saved = localStorage.getItem("cleaningSessionData");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Date.now() - parsed.timestamp < 10 * 60 * 1000) {
+          setCleanedData(parsed.cleanedData);
+          setCleanedHeaders(parsed.cleanedHeaders);
+          
+          const csvContent = convertToCSV(parsed.cleanedData, parsed.cleanedHeaders);
+          const blob = new Blob([csvContent], { type: "text/csv" });
+          setCleanedFileUrl(window.URL.createObjectURL(blob));
+        } else {
+          localStorage.removeItem("cleaningSessionData");
+        }
+      } catch (e) {
+        localStorage.removeItem("cleaningSessionData");
+      }
+    }
+  }, []);
 
   const handleUpload = async () => {
     if (!file) { alert("Please upload a CSV file!"); return; }
@@ -51,6 +74,13 @@ export default function Cleaning() {
       const blob = new Blob([csvContent], { type: "text/csv" });
       const url = window.URL.createObjectURL(blob);
       setCleanedFileUrl(url);
+
+      // Save session for 10-minute persistence
+      localStorage.setItem("cleaningSessionData", JSON.stringify({
+        timestamp: Date.now(),
+        cleanedData: result.cleaned_data,
+        cleanedHeaders: result.columns
+      }));
 
     } catch (err) {
       console.error(err);
@@ -97,6 +127,41 @@ export default function Cleaning() {
       alert("Failed to create dashboard: " + err.message);
     } finally {
       setDashboardLoading(false);
+    }
+  };
+
+  // ── NEW: Chat with Cleaned Data ──────────────────────────────────────────
+  const handleChatWithData = async () => {
+    if (!cleanedData.length) return;
+
+    setChatLoading(true);
+    try {
+      const csvContent = convertToCSV(cleanedData, cleanedHeaders);
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const csvFile = new File([blob], "cleaned_data.csv", { type: "text/csv" });
+
+      const formData = new FormData();
+      formData.append("file", csvFile);
+
+      const res = await fetch("http://127.0.0.1:8000/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Failed to initialize chat");
+
+      localStorage.setItem("chatSessionData", JSON.stringify({
+        sessionId: data.session_id,
+        schemaInfo: data.schema_info
+      }));
+
+      navigate("/data-chat");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to initialize chat: " + err.message);
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -299,11 +364,22 @@ export default function Cleaning() {
                 <button
                   className="action-btn btn-dashboard"
                   onClick={handleCreateDashboard}
-                  disabled={dashboardLoading}
+                  disabled={dashboardLoading || chatLoading}
                 >
                   {dashboardLoading
                     ? <><span className="material-symbols-outlined spin">refresh</span> Creating…</>
                     : <><span className="material-symbols-outlined">dashboard_customize</span> Create Dashboard</>
+                  }
+                </button>
+
+                <button
+                  className="action-btn btn-dashboard"
+                  onClick={handleChatWithData}
+                  disabled={chatLoading || dashboardLoading}
+                >
+                  {chatLoading
+                    ? <><span className="material-symbols-outlined spin">refresh</span> Starting Chat…</>
+                    : <><span className="material-symbols-outlined">forum</span> Chat with Data</>
                   }
                 </button>
               </div>

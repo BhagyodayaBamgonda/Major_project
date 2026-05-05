@@ -11,13 +11,9 @@ import DataChat from "./pages/DataChat";
 import Login from "./pages/login";
 import Register from "./pages/register";;
 
-// 🔐 Protected Route Component
 function ProtectedRoute({ children }) {
-  // const isLoggedIn = localStorage.getItem("user");
-  // return isLoggedIn ? children : <Navigate to="/login" />;
-  
-  // Bypassed for local testing:
-  return children;
+  const user = localStorage.getItem("user");
+  return user ? children : <Navigate to="/login" />;
 }
 
 // 🔄 Layout to hide navbar on login/register
