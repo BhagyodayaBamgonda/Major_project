@@ -68,6 +68,8 @@ RULES (STRICT)
 11. Assign final output ONLY to:
     result
 
+12. DO NOT use `.to_markdown()` or any external formatting libraries like tabulate. Use `.to_string()`, `.to_dict()`, or just return the raw DataFrame/Series.
+
 -------------------------------------
 CRITICAL RULES
 -------------------------------------

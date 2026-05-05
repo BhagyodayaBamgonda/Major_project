@@ -3,6 +3,13 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable"; // ✅ correct import
 import "./Reports.css";
 
+// Safely convert any value to a string React can render
+const safeVal = (v) => {
+  if (v === null || v === undefined) return "-";
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+};
+
 export default function Reports() {
   const [data, setData] = useState(null);
 
@@ -14,6 +21,22 @@ export default function Reports() {
       // Dynamically generate top 10 rows if not present
       if (!parsed.top_rows && parsed.rows) {
         parsed.top_rows = parsed.rows.slice(0, 10);
+      }
+
+      // Normalize columns_meta so it is ALWAYS an array of plain-string objects.
+      // `columns` might be strings ["col1"] OR legacy objects [{column,dtype,...}].
+      if (!parsed.columns_meta && parsed.columns) {
+        parsed.columns_meta = parsed.columns.map((c) => {
+          if (c !== null && typeof c === "object") {
+            return {
+              column: String(c.column ?? ""),
+              dtype: String(c.dtype ?? "-"),
+              role: String(c.role ?? "-"),
+              non_null_count: String(c.non_null_count ?? "-"),
+            };
+          }
+          return { column: String(c), dtype: "-", role: "-", non_null_count: "-" };
+        });
       }
 
       setData(parsed);
@@ -114,7 +137,7 @@ export default function Reports() {
           {Object.entries(data.kpis || {}).map(([k, v]) => (
             <div key={k} className="report-kpi-card">
               <h3>{k.toUpperCase()}</h3>
-              <p>{v}</p>
+              <p>{safeVal(v)}</p>
             </div>
           ))}
         </div>
@@ -133,13 +156,12 @@ export default function Reports() {
                 </tr>
               </thead>
               <tbody>
-                {/* Fallback to simple mapping if columns_meta is missing but columns exists */}
-                {(data.columns_meta || (data.columns && data.columns.map(c => ({column: c, dtype: '-', role: '-', non_null_count: '-'}))))?.map((col, idx) => (
+                {(data.columns_meta || []).map((col, idx) => (
                   <tr key={idx}>
-                    <td>{col.column || col}</td>
-                    <td>{col.dtype || '-'}</td>
-                    <td>{col.role || '-'}</td>
-                    <td>{col.non_null_count || '-'}</td>
+                    <td>{safeVal(col.column)}</td>
+                    <td>{safeVal(col.dtype)}</td>
+                    <td>{safeVal(col.role)}</td>
+                    <td>{safeVal(col.non_null_count)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -164,7 +186,7 @@ export default function Reports() {
                   {(data.preview?.rows || data.data?.slice(0, 10) || data.rows?.slice(0, 10)).map((row, idx) => (
                     <tr key={idx}>
                       {Object.values(row).map((v, i) => (
-                        <td key={i}>{v}</td>
+                        <td key={i}>{safeVal(v)}</td>
                       ))}
                     </tr>
                   ))}

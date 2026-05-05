@@ -21,6 +21,7 @@ backend/__pycache__/
 venv/
 .env
 myenv/
+exports/
 # --------------------
 # Logs
 # --------------------

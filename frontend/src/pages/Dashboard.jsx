@@ -4,6 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+// Safely convert any value to a renderable string
+const safeVal = (v) => {
+  if (v === null || v === undefined) return "-";
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+};
+
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -132,6 +139,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-page">
+      {error && <div className="error-message">{error}</div>}
       
       {/* HEADER */}
       <header className="dashboard-header">
@@ -191,12 +199,12 @@ export default function Dashboard() {
 
             <select className="dash-select" onChange={(e) => setSelectedX(e.target.value)}>
               <option>Select X Axis</option>
-              {columns.map((col, i) => <option key={i}>{col}</option>)}
+              {columns.map((col, i) => <option key={i}>{safeVal(col)}</option>)}
             </select>
 
             <select className="dash-select" onChange={(e) => setSelectedY(e.target.value)}>
               <option>Select Y Axis</option>
-              {columns.map((col, i) => <option key={i}>{col}</option>)}
+              {columns.map((col, i) => <option key={i}>{safeVal(col)}</option>)}
             </select>
 
             <button className="btn-primary" onClick={handleAddChart}>Add Chart</button>
