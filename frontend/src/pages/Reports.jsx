@@ -74,94 +74,106 @@ export default function Reports() {
 
   if (!data)
     return (
-      <div className="reports-container">
-        <h2 className="reports-title">No Data Found</h2>
-        <p>Please upload and process a dataset first.</p>
-        {localStorage.getItem("dashboardData") && (
-          <div className="reports-actions">
-            <button onClick={() => setData(JSON.parse(localStorage.getItem("dashboardData")))}>
-              Reload Saved Data
-            </button>
-            <button onClick={clearData}>Clear Saved Data</button>
-          </div>
-        )}
+      <div className="reports-page">
+        <div className="reports-empty">
+          <span className="material-symbols-outlined empty-icon">description</span>
+          <h2>No Data Found</h2>
+          <p>Please upload and process a dataset first.</p>
+          {localStorage.getItem("dashboardData") && (
+            <div className="reports-empty-actions">
+              <button className="btn-primary" onClick={() => setData(JSON.parse(localStorage.getItem("dashboardData")))}>
+                Reload Saved Data
+              </button>
+              <button className="btn-danger" onClick={clearData}>Clear Saved Data</button>
+            </div>
+          )}
+        </div>
       </div>
     );
 
   return (
-    <div className="reports-container">
-      <h2 className="reports-title">📑 Data Reports</h2>
-
-      {/* KPI Section */}
-      <div className="reports-kpis">
-        {Object.entries(data.kpis || {}).map(([k, v]) => (
-          <div key={k} className="report-card">
-            <h3>{k.toUpperCase()}</h3>
-            <p>{v}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Columns Summary */}
-      <div className="reports-table">
-        <h3>Column Details</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Column</th>
-              <th>DType</th>
-              <th>Role</th>
-              <th>Non-Null Count</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.columns &&
-              data.columns.map((col, idx) => (
-                <tr key={idx}>
-                  <td>{col.column}</td>
-                  <td>{col.dtype}</td>
-                  <td>{col.role}</td>
-                  <td>{col.non_null_count}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Top 10 Rows */}
-      {data.rows && data.rows.length > 0 && (
-        <div className="reports-table">
-          <h3>Top 10 Rows</h3>
-          <table>
-            <thead>
-              <tr>
-                {Object.keys(data.rows[0]).map((h, idx) => (
-                  <th key={idx}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.rows.slice(0, 10).map((row, idx) => (
-                <tr key={idx}>
-                  {Object.values(row).map((v, i) => (
-                    <td key={i}>{v}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="reports-page">
+      <div className="reports-header">
+        <div className="rh-title">
+          <span className="material-symbols-outlined">summarize</span>
+          <h2>Data Reports</h2>
         </div>
-      )}
+        <div className="reports-actions">
+          <button onClick={downloadReport} className="btn-outline">
+            <span className="material-symbols-outlined">download</span> Download PDF
+          </button>
+          <button onClick={clearData} className="btn-danger">
+            <span className="material-symbols-outlined">delete</span> Clear Saved Data
+          </button>
+        </div>
+      </div>
 
-      {/* Download Report Button */}
-      <button onClick={downloadReport} className="download-report-btn">
-        📥 Download PDF Report
-      </button>
+      <div className="reports-content">
+        {/* KPI Section */}
+        <div className="reports-kpis">
+          {Object.entries(data.kpis || {}).map(([k, v]) => (
+            <div key={k} className="report-kpi-card">
+              <h3>{k.toUpperCase()}</h3>
+              <p>{v}</p>
+            </div>
+          ))}
+        </div>
 
-      {/* Clear Data Button */}
-      <button onClick={clearData} className="clear-report-data-btn">
-        🗑 Clear Saved Data
-      </button>
+        {/* Columns Summary */}
+        <div className="reports-table-wrap">
+          <h3 className="table-title">Column Details</h3>
+          <div className="reports-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Column</th>
+                  <th>DType</th>
+                  <th>Role</th>
+                  <th>Non-Null Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Fallback to simple mapping if columns_meta is missing but columns exists */}
+                {(data.columns_meta || (data.columns && data.columns.map(c => ({column: c, dtype: '-', role: '-', non_null_count: '-'}))))?.map((col, idx) => (
+                  <tr key={idx}>
+                    <td>{col.column || col}</td>
+                    <td>{col.dtype || '-'}</td>
+                    <td>{col.role || '-'}</td>
+                    <td>{col.non_null_count || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Top 10 Rows */}
+        {(data.preview?.rows || data.data?.slice(0, 10) || data.rows?.slice(0, 10)) && (
+          <div className="reports-table-wrap">
+            <h3 className="table-title">Top 10 Rows</h3>
+            <div className="reports-table">
+              <table>
+                <thead>
+                  <tr>
+                    {Object.keys((data.preview?.rows || data.data || data.rows)[0] || {}).map((h, idx) => (
+                      <th key={idx}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(data.preview?.rows || data.data?.slice(0, 10) || data.rows?.slice(0, 10)).map((row, idx) => (
+                    <tr key={idx}>
+                      {Object.values(row).map((v, i) => (
+                        <td key={i}>{v}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

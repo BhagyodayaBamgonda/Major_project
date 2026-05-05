@@ -131,28 +131,33 @@ export default function Dashboard() {
   const columns = data?.columns || [];
 
   return (
-    <div className="dashboard-wrapper">
+    <div className="dashboard-page">
       
       {/* HEADER */}
       <header className="dashboard-header">
-        <h1>📊 Dashboard</h1>
+        <div className="dh-title">
+          <span className="material-symbols-outlined">dashboard</span>
+          <h1>Dashboard</h1>
+        </div>
 
         <div className="dashboard-actions">
-          <button onClick={() => setShowUploadModal(true)}>
-            Upload File
+          <button className="btn-primary" onClick={() => setShowUploadModal(true)}>
+            <span className="material-symbols-outlined">upload</span> Upload File
           </button>
 
           {data && (
             <>
-              <button onClick={() => setEditMode(!editMode)}>
-                {editMode ? "Exit Edit" : "Edit Dashboard"}
+              <button className="btn-outline" onClick={() => setEditMode(!editMode)}>
+                <span className="material-symbols-outlined">edit</span> {editMode ? "Exit Edit" : "Edit Dashboard"}
               </button>
 
-              <button onClick={handleDownloadDashboard}>
-                Download PDF
+              <button className="btn-outline" onClick={handleDownloadDashboard}>
+                <span className="material-symbols-outlined">download</span> Download PDF
               </button>
 
-              <button onClick={clearData}>Clear</button>
+              <button className="btn-danger" onClick={clearData}>
+                <span className="material-symbols-outlined">delete</span> Clear
+              </button>
             </>
           )}
         </div>
@@ -160,59 +165,68 @@ export default function Dashboard() {
 
       {/* UPLOAD MODAL */}
       {showUploadModal && (
-        <div className="modal">
-          <input type="file" onChange={handleFileUpload} />
-          <button onClick={() => setShowUploadModal(false)}>Close</button>
+        <div className="dash-modal-overlay">
+          <div className="dash-modal">
+            <h3>Upload Dataset</h3>
+            <p>Upload a CSV or Excel file to generate your dashboard.</p>
+            <input type="file" onChange={handleFileUpload} className="dash-file-input" />
+            <div className="dash-modal-actions">
+              <button className="btn-outline" onClick={() => setShowUploadModal(false)}>Close</button>
+            </div>
+          </div>
         </div>
       )}
 
       {/* EDIT PANEL */}
       {editMode && data && (
         <div className="edit-panel">
-          <h3>Add Visualization</h3>
+          <h3><span className="material-symbols-outlined">add_chart</span> Add Visualization</h3>
+          <div className="edit-controls">
+            <select className="dash-select" onChange={(e) => setChartType(e.target.value)}>
+              <option value="bar">Bar Chart</option>
+              <option value="scatter">Scatter Plot</option>
+              <option value="line">Line Chart</option>
+              <option value="pie">Pie Chart</option>
+            </select>
 
-          <select onChange={(e) => setChartType(e.target.value)}>
-            <option value="bar">Bar</option>
-            <option value="scatter">Scatter</option>
-            <option value="line">Line</option>
-            <option value="pie">Pie</option>
-          </select>
+            <select className="dash-select" onChange={(e) => setSelectedX(e.target.value)}>
+              <option>Select X Axis</option>
+              {columns.map((col, i) => <option key={i}>{col}</option>)}
+            </select>
 
-          <select onChange={(e) => setSelectedX(e.target.value)}>
-            <option>Select X</option>
-            {columns.map((col, i) => (
-              <option key={i}>{col}</option>
-            ))}
-          </select>
+            <select className="dash-select" onChange={(e) => setSelectedY(e.target.value)}>
+              <option>Select Y Axis</option>
+              {columns.map((col, i) => <option key={i}>{col}</option>)}
+            </select>
 
-          <select onChange={(e) => setSelectedY(e.target.value)}>
-            <option>Select Y</option>
-            {columns.map((col, i) => (
-              <option key={i}>{col}</option>
-            ))}
-          </select>
-
-          <button onClick={handleAddChart}>Add Chart</button>
+            <button className="btn-primary" onClick={handleAddChart}>Add Chart</button>
+          </div>
         </div>
       )}
 
       {/* DASHBOARD */}
       {data ? (
-        <div ref={dashboardRef}>
+        <div ref={dashboardRef} className="dashboard-content">
           <div className="charts-grid">
             {data.charts?.map((chart, idx) => (
               <div key={idx} className="chart-card">
-                <h3>{chart.title}</h3>
+                <h3 className="chart-title">{chart.title}</h3>
 
                 <Plot
                   data={chart.figure.data}
-                  layout={chart.figure.layout}
+                  layout={{
+                    ...chart.figure.layout,
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    font: { family: 'Inter, sans-serif' }
+                  }}
+                  useResizeHandler={true}
                   style={{ width: "100%", height: "400px" }}
                 />
 
                 {editMode && (
-                  <button onClick={() => deleteChart(idx)}>
-                    Delete
+                  <button className="btn-danger-sm chart-delete-btn" onClick={() => deleteChart(idx)}>
+                    <span className="material-symbols-outlined">delete</span>
                   </button>
                 )}
               </div>
@@ -220,7 +234,11 @@ export default function Dashboard() {
           </div>
         </div>
       ) : (
-        <h2>Upload file to start</h2>
+        <div className="dashboard-empty">
+          <span className="material-symbols-outlined empty-icon">monitoring</span>
+          <h2>No Dashboard Data</h2>
+          <p>Upload a file or create a dashboard from the Cleaning tab to get started.</p>
+        </div>
       )}
     </div>
   );

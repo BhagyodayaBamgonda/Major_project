@@ -20,7 +20,7 @@ backend/__pycache__/
 *.egg-info/
 venv/
 .env
-
+myenv/
 # --------------------
 # Logs
 # --------------------

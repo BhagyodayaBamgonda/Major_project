@@ -33,6 +33,9 @@ function Register() {
 
   return (
     <div className="auth-wrapper">
+      <Link to="/" className="back-link">
+        ← Back to Home
+      </Link>
       <div className="auth-card">
         <h2>Create Account</h2>
 

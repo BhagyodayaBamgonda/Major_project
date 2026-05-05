@@ -1,215 +1,215 @@
-/* Dashboard Wrapper */
-.dashboard-wrapper {
-min-height: 100vh;
-background: #0f172a;
-color: #e2e8f0;
-padding: 20px;
-font-family: 'Poppins', sans-serif;
+/* ── Dashboard Page ── */
+.dashboard-page {
+  min-height: 100vh;
+  background: var(--surface);
+  padding: 36px 32px 48px;
+  font-family: 'Inter', sans-serif;
+  color: var(--on-surface);
 }
 
-/* Header */
+/* ── Header ── */
 .dashboard-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-background: #1e293b;
-padding: 16px 24px;
-border-radius: 10px;
-margin-bottom: 20px;
-border: 1px solid #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 18px 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid var(--outline-subtle);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
-.dashboard-header h1 {
-font-size: 22px;
-font-weight: 600;
-color: #f8fafc;
+.dh-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dh-title .material-symbols-outlined {
+  font-size: 28px;
+  color: var(--primary);
+}
+.dh-title h1 {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--on-surface);
+  letter-spacing: -0.02em;
 }
 
-/* Actions */
+/* ── Actions / Buttons ── */
 .dashboard-actions {
-display: flex;
-gap: 12px;
-flex-wrap: wrap;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-/* Buttons */
-.upload-data-btn,
-.download-dashboard-btn,
-.clear-dashboard-btn {
-padding: 8px 16px;
-border-radius: 6px;
-font-size: 14px;
-font-weight: 500;
-border: none;
-cursor: pointer;
-transition: 0.2s ease;
+.dashboard-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+.dashboard-actions button .material-symbols-outlined { font-size: 18px; }
+
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: #004c6e; transform: translateY(-1px); }
+
+.btn-outline { background: #fff; color: var(--on-surface); border: 1px solid var(--outline-subtle) !important; }
+.btn-outline:hover { background: var(--surface-low); }
+
+.btn-danger { background: #fff1f2; color: #be123c; border: 1px solid #fda4af !important; }
+.btn-danger:hover { background: #fecdd3; }
+
+.btn-danger-sm {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fda4af;
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-danger-sm:hover { background: #fecdd3; }
+
+/* ── Modal ── */
+.dash-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-/* Primary Button */
-.upload-data-btn {
-background-color: #2563eb;
-color: white;
+.dash-modal {
+  background: #fff;
+  padding: 32px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 440px;
+  border: 1px solid var(--outline-subtle);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  text-align: center;
 }
-.upload-data-btn:hover {
-background-color: #1d4ed8;
+.dash-modal h3 { margin: 0 0 8px; font-size: 20px; font-weight: 700; color: var(--on-surface); }
+.dash-modal p { margin: 0 0 24px; font-size: 14px; color: var(--on-surface-muted); }
+
+.dash-file-input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 24px;
+  border: 1px dashed var(--outline);
+  border-radius: 8px;
+  background: var(--surface-low);
+  font-size: 14px;
 }
 
-/* Secondary */
-.download-dashboard-btn {
-background-color: #475569;
-color: white;
+.dash-modal-actions { display: flex; justify-content: center; }
+
+/* ── Edit Panel ── */
+.edit-panel {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--primary-light);
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0,101,145,0.06);
 }
-.download-dashboard-btn:hover {
-background-color: #334155;
+.edit-panel h3 {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
 }
 
-/* Danger */
-.clear-dashboard-btn {
-background-color: #dc2626;
-color: white;
-}
-.clear-dashboard-btn:hover {
-background-color: #b91c1c;
+.edit-controls {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-/* Container */
-.dashboard-container {
-background: #1e293b;
-padding: 20px;
-border-radius: 10px;
-border: 1px solid #334155;
+.dash-select {
+  padding: 10px 14px;
+  border: 1px solid var(--outline-subtle);
+  border-radius: 8px;
+  background: var(--surface-low);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--on-surface);
+  outline: none;
+  flex: 1;
+  min-width: 180px;
+}
+.dash-select:focus { border-color: var(--primary); }
+
+.edit-controls .btn-primary { padding: 10px 24px; }
+
+/* ── Content / Charts Grid ── */
+.dashboard-content {
+  background: #fff;
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid var(--outline-subtle);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
 }
 
-/* KPI Grid */
-.kpi-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-gap: 16px;
-margin-bottom: 25px;
-}
-
-.kpi-card {
-background: #0f172a;
-padding: 18px;
-border-radius: 10px;
-border: 1px solid #334155;
-transition: 0.2s ease;
-}
-.kpi-card:hover {
-transform: translateY(-3px);
-border-color: #2563eb;
-}
-
-.kpi-title {
-font-size: 13px;
-color: #94a3b8;
-margin-bottom: 5px;
-}
-
-.kpi-value {
-font-size: 22px;
-font-weight: 600;
-color: #38bdf8;
-}
-
-/* Charts */
 .charts-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 28px;
 }
 
 .chart-card {
-background: #0f172a;
-padding: 15px;
-border-radius: 10px;
-border: 1px solid #334155;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--outline-subtle);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .chart-title {
-font-size: 15px;
-margin-bottom: 10px;
-color: #e2e8f0;
-font-weight: 500;
-text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--on-surface);
+  margin: 0 0 16px;
+  text-align: center;
 }
 
-.chart-container {
-width: 100%;
-height: 350px;
+.chart-delete-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
-/* Modal */
-.modal-overlay {
-position: fixed;
-inset: 0;
-background: rgba(0,0,0,0.6);
-display: flex;
-justify-content: center;
-align-items: center;
+/* ── Empty State ── */
+.dashboard-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 50vh;
+  text-align: center;
+  background: #fff;
+  border: 1px dashed var(--outline);
+  border-radius: 16px;
+  color: var(--on-surface-muted);
 }
-
-.modal-content {
-background: #1e293b;
-padding: 24px;
-border-radius: 10px;
-width: 90%;
-max-width: 500px;
-border: 1px solid #334155;
-}
-
-.modal-content h3 {
-margin-bottom: 12px;
-color: #f8fafc;
-}
-
-.modal-content p {
-color: #cbd5e1;
-margin-bottom: 16px;
-}
-
-/* File Upload */
-.file-upload-label {
-display: inline-block;
-padding: 10px 20px;
-background-color: #2563eb;
-color: white;
-border-radius: 6px;
-cursor: pointer;
-}
-
-.file-upload-label:hover {
-background-color: #1d4ed8;
-}
-
-/* Loading */
-.loading-spinner {
-width: 40px;
-height: 40px;
-border: 4px solid #334155;
-border-top-color: #2563eb;
-border-radius: 50%;
-animation: spin 1s linear infinite;
-}
-
-.loading-text {
-font-size: 16px;
-color: #94a3b8;
-}
-
-/* Error */
-.error-container {
-text-align: center;
-padding: 30px;
-background: #7f1d1d20;
-border-radius: 10px;
-}
-
-.error-message {
-color: #f87171;
-}
-
-/* Animation */
-@keyframes spin {
-to { transform: rotate(360deg); }
-}
+.empty-icon { font-size: 56px; color: var(--outline-subtle); }
+.dashboard-empty h2 { margin: 0; font-size: 20px; font-weight: 700; color: var(--on-surface); }
+.dashboard-empty p { margin: 0; font-size: 15px; }

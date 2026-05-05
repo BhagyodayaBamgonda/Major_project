@@ -35,6 +35,22 @@ os.makedirs(EXPORT_DIR, exist_ok=True)
 # Store analysis history for dashboard
 analysis_history = []
 
+def infer_and_convert_types(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Robustly infers and converts string columns back to their proper numeric types.
+    This exactly mimics pd.read_csv behavior for JSON payloads.
+    """
+    # Treat empty strings or pure whitespace as NaN
+    df = df.replace(r'^\s*$', np.nan, regex=True)
+    
+    for col in df.columns:
+        converted = pd.to_numeric(df[col], errors='coerce')
+        # If conversion doesn't introduce any new NaNs (all non-null strings were valid numbers)
+        if df[col].notna().sum() > 0 and converted.notna().sum() == df[col].notna().sum():
+            df[col] = converted
+            
+    return df
+
 def try_parse_dates(df: pd.DataFrame) -> pd.DataFrame:
     for col in df.columns:
         if "date" in col.lower():
@@ -51,11 +67,17 @@ def role_of_dtype(dtype: str) -> str:
         return "numeric"
     return "categorical"
 
+def clean_title(name: str) -> str:
+    """Helper to convert 'ad_revenue' to 'Ad Revenue'"""
+    return str(name).replace("_", " ").title()
+
+
 def make_histograms(df, numeric_cols, max_count=3):
     charts = []
     for col in list(numeric_cols)[:max_count]:
+        c_title = clean_title(col)
         fig = px.histogram(df, x=col, nbins=20, template="plotly_white",
-                           title=f"Distribution of {col}")
+                           title=f"Distribution of {c_title}")
         charts.append(("hist", col, fig))
     return charts
 
@@ -66,7 +88,7 @@ def make_bar_cat_num(df, categorical_cols, numeric_cols):
         num = numeric_cols[0]
         agg = df.groupby(cat, dropna=False)[num].mean().reset_index()
         fig = px.bar(agg, x=cat, y=num, template="plotly_white",
-                     title=f"{num} by {cat}")
+                     title=f"{clean_title(num)} by {clean_title(cat)}")
         charts.append(("bar", f"{num}_by_{cat}", fig))
     return charts
 
@@ -77,7 +99,7 @@ def make_pie(df, categorical_cols):
         # Limit to top 10 categories for better visualization
         value_counts = df[cat].value_counts().head(10)
         fig = px.pie(values=value_counts.values, names=value_counts.index, 
-                     template="plotly_white", title=f"{cat} Distribution")
+                     template="plotly_white", title=f"{clean_title(cat)} Distribution")
         charts.append(("pie", f"{cat}_distribution", fig))
     return charts
 
@@ -89,7 +111,7 @@ def make_timeseries(df, date_cols, numeric_cols):
         tmp = df[[d, n]].dropna(subset=[d])
         if len(tmp) > 1:  # Only create timeseries if we have enough data
             fig = px.line(tmp, x=d, y=n, template="plotly_white",
-                          title=f"{n} over {d}")
+                          title=f"{clean_title(n)} over {clean_title(d)}")
             fig.update_traces(mode="lines+markers")
             charts.append(("line", f"time_{n}_by_{d}", fig))
     return charts
@@ -99,7 +121,7 @@ def make_scatter_plot(df, numeric_cols):
     if len(numeric_cols) >= 2:
         x_col, y_col = numeric_cols[0], numeric_cols[1]
         fig = px.scatter(df, x=x_col, y=y_col, template="plotly_white",
-                         title=f"{y_col} vs {x_col}")
+                         title=f"{clean_title(y_col)} vs {clean_title(x_col)}")
         charts.append(("scatter", f"{y_col}_vs_{x_col}", fig))
     return charts
 
@@ -318,6 +340,89 @@ def upload():
         logger.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
+@app.route("/create-dashboard", methods=["POST"])
+def create_dashboard():
+    """Accept cleaned JSON data and build a full dashboard (charts + KPIs)."""
+    try:
+        if not request.is_json:
+            return jsonify({"error": "Request must be JSON"}), 400
+
+        payload = request.get_json()
+        if not payload or "data" not in payload:
+            return jsonify({"error": "No data provided"}), 400
+
+        df = pd.DataFrame(payload["data"])
+        df = infer_and_convert_types(df)
+        df = try_parse_dates(df)
+
+        # KPIs
+        kpis = {
+            "rows":       int(df.shape[0]),
+            "columns":    int(df.shape[1]),
+            "missing":    int(df.isna().sum().sum()),
+            "duplicates": int(df.duplicated().sum()),
+        }
+
+        # Column meta
+        cols_meta = []
+        for c in df.columns:
+            dtype = str(df[c].dtype)
+            cols_meta.append({
+                "column": str(c),
+                "dtype": dtype,
+                "role": role_of_dtype(dtype),
+                "non_null_count": int(df[c].notna().sum()),
+            })
+
+        numeric_cols    = df.select_dtypes(include=[np.number]).columns.tolist()
+        categorical_cols = df.select_dtypes(exclude=[np.number]).columns.tolist()
+        datetime_cols   = df.select_dtypes(include=["datetime64[ns]"]).columns.tolist()
+
+        chart_objs = []
+        chart_objs += make_histograms(df, numeric_cols, max_count=3)
+        chart_objs += make_bar_cat_num(df, categorical_cols, numeric_cols)
+        chart_objs += make_pie(df, categorical_cols)
+        chart_objs += make_timeseries(df, datetime_cols, numeric_cols)
+        chart_objs += make_scatter_plot(df, numeric_cols)
+        chart_objs += make_correlation_heatmap(df, numeric_cols)
+
+        chart_specs = []
+        for kind, key, fig in chart_objs:
+            img_name = f"{kind}_{key}_{uuid.uuid4().hex}.png"
+            img_path = os.path.join(EXPORT_DIR, img_name)
+            
+            # Wrap image generation in try/except because Kaleido/Plotly version mismatch crashes the server
+            try:
+                pio.write_image(fig, img_path, format="png", scale=2, width=1200, height=700)
+            except Exception as e:
+                logger.warning(f"Skipping static image generation for {key}: {str(e)}")
+                
+            fig_dict = json.loads(json.dumps(fig.to_dict(), cls=PlotlyJSONEncoder))
+            chart_specs.append({
+                "title": str(fig.layout.title.text) if fig.layout.title and fig.layout.title.text else key,
+                "figure": fig_dict,
+                "image_url": f"/download/{img_name}",
+            })
+
+        dashboard_data = {
+            "kpis": kpis,
+            "columns": [str(c) for c in df.columns],
+            "data": df.to_dict(orient="records"),
+            "preview": {
+                "columns": [str(c) for c in df.columns],
+                "rows": df.head(10).to_dict(orient="records"),
+            },
+            "charts": chart_specs,
+            "timestamp": datetime.now().isoformat(),
+        }
+        return jsonify(dashboard_data)
+
+    except Exception as e:
+        logger.error(f"Error in /create-dashboard: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/clean", methods=["POST"])
 def clean_data():
     """Endpoint to clean data without uploading a new file"""
@@ -338,6 +443,7 @@ def clean_data():
             
         # Convert to DataFrame
         df = pd.DataFrame(data["data"])
+        df = infer_and_convert_types(df)
         logger.info(f"DataFrame created with shape: {df.shape}")
         
         # Get cleaning options from request

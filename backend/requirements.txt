@@ -4,3 +4,15 @@ pandas
 numpy
 plotly
 kaleido
+fastapi
+uvicorn
+openpyxl
+python-multipart
+requests
+pydantic
+httpx
+google-genai
+python-dotenv
+bcrypt
+flask-mysqldb
+
